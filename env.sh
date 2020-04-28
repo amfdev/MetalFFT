@@ -1,0 +1,5 @@
+alias init="cmake -H. -B_build -GXcode"
+alias build="cmake --build _build"
+alias run="open _build/Debug/Test.app"
+alias runConsole="_build/Debug/Test.app/Contents/MacOS/Test -o run"
+alias debug="lldb _build/Debug/Test.app/Contents/MacOS/Test -o run"
