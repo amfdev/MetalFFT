@@ -1,14 +1,21 @@
-cmake_minimum_required(VERSION 3.0)
-project(MetalFFT)
-set(NAME MetalFFT)
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
-
+cmake_minimum_required(VERSION 2.8)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
+
+if(NOT WIN32)
+  #message(SEND_ERROR "ERROR: Test are prepared for Windows ONLY!")
+endif()
+
+if(AMF_CORE_STATIC)
+  message("static AMF build will be used")
+  ADD_DEFINITIONS(-DAMF_CORE_STATIC)
+else()
+  message("shared AMF build will be used")
+endif()
 
 if(NOT AMF_NAME)
   set(AMF_NAME openAmf)
@@ -58,41 +65,28 @@ else()
   endif()
 endif()
 
-project(MetalFFT)
-set(NAME MetalFFT)
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+project(fftSample)
 
-enable_language(CXX)
+# Local header files here ONLY
+SET(HEADERS
 
-set(HEADER_FILES
-  plan.h
-  metalFFT.h
-  action.h
-  lock.h
-  metalFFT_common.h
-  generator.h
-  thirdparty/FFT_3.h
-)
-set(SOURCE_FILES
-  action.cpp
-	generator.cpp
-	metalFFT.cpp
-	plan.cpp
-	repo.cpp
-)
+   )
 
-add_library(
-    ${NAME}
-    STATIC
-    #SHARED
-    ${SOURCE_FILES}
+# Local source files here
+SET(SOURCES
+    fft1d.cpp
+    )
+
+add_subdirectory(.. amffft)
+
+add_executable(
+    ${PROJECT_NAME}
+    ${SOURCES}
     ${HEADER_FILES}
 )
-include_directories(../../../include)
-add_subdirectory(../../cmake ${AMF_NAME})
 
 if(AMF_CORE_STATIC)
   target_link_libraries(${PROJECT_NAME} ${AMF_NAME} ${OpenCL_LIBRARIES})
 else()
-  target_link_libraries(${PROJECT_NAME} ${AMF_LOADER_NAME})
+  target_link_libraries(${PROJECT_NAME} amffft)
 endif()

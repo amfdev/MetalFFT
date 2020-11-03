@@ -1,19 +1,28 @@
 #include "metalFFT_common.h"
+#include "repo.h"
+#include "action.h"
+#pragma once
+#define metalfftVersionMajor 0
+#define metalfftVersionMinor 3
+#define metalfftVersionPatch 0
+
+#define METALFFT_STATIC 1
+//#define METALFFT_EXPORTS 1
 
 #if defined( _WIN32 )
     #if !defined( __cplusplus )
         #define inline __inline
     #endif
 
-    #if defined( CLFFT_STATIC )
-        #define CLFFTAPI
-    #elif defined( CLFFT_EXPORTS )
-        #define CLFFTAPI __declspec( dllexport )
+    #if defined( METALFFT_STATIC )
+        #define METALFFTAPI
+    #elif defined( METALFFT_EXPORTS )
+        #define METALFFTAPI __declspec( dllexport )
     #else
-        #define CLFFTAPI __declspec( dllimport )
+        #define METALFFTAPI __declspec( dllimport )
     #endif
 #else
-    #define CLFFTAPI
+    #define METALFFTAPI
 #endif
 
 #ifdef __cplusplus
@@ -25,8 +34,8 @@ extern "C" {
 *  @param[out] setupData Data structure is cleared and initialized with version information and default values
 *  @return Enum describes the error condition; superset of OpenCL error codes
 */
-CLFFTAPI metalfftStatus metalfftInitSetupData( metalfftSetupData* setupData ){return METALFFT_NOTIMPLEMENTED;}
 
+METALFFTAPI metalfftStatus metalfftInitSetupData(metalfftSetupData* setupData);
 
 /*! @brief Initialize the internal FFT resources.
 *  @details The internal resources include FFT implementation caches kernels, programs, and buffers.
@@ -34,7 +43,7 @@ CLFFTAPI metalfftStatus metalfftInitSetupData( metalfftSetupData* setupData ){re
 * 	and debug functionality
 *  @return Enum describing error condition; superset of OpenCL error codes
 */
-CLFFTAPI metalfftStatus	metalfftSetup( const metalfftSetupData* setupData ){return METALFFT_NOTIMPLEMENTED;}
+METALFFTAPI metalfftStatus	metalfftSetup(const metalfftSetupData* setupData);
 
 
 /*! @brief Create a plan object initialized entirely with default values.
@@ -46,8 +55,8 @@ CLFFTAPI metalfftStatus	metalfftSetup( const metalfftSetupData* setupData ){retu
 *  @param[in] clLengths An array of length of size 'dim';  each array value describes the length of each dimension
 *  @return Enum describing error condition; superset of OpenCL error codes
 */
-CLFFTAPI metalfftStatus	metalfftCreateDefaultPlan( metalfftPlanHandle* plHandle, const metalfftDim dim,
-								const size_t* clLengths ){return METALFFT_NOTIMPLEMENTED;}
+METALFFTAPI metalfftStatus	metalfftCreateDefaultPlan(metalfftPlanHandle* plHandle, const metalfftDim dim,
+	const size_t* clLengths);
 
 /*! @brief Set the floating point precision of the FFT data
 *  @details Sets the floating point precision of the FFT complex data in the plan.
@@ -55,7 +64,11 @@ CLFFTAPI metalfftStatus	metalfftCreateDefaultPlan( metalfftPlanHandle* plHandle,
 *  @param[in] precision Reference to the user clfftPrecision enum
 *  @return Enum describing error condition; superset of OpenCL error codes
 */
-CLFFTAPI metalfftStatus	metalfftSetPlanPrecision( metalfftPlanHandle plHandle, metalfftPrecision precision){return METALFFT_NOTIMPLEMENTED;}
+METALFFTAPI metalfftStatus	metalfftSetPlanPrecision(metalfftPlanHandle plHandle, metalfftPrecision precision);
+
+METALFFTAPI metalfftStatus	metalfftSetPlanFFTmethod(metalfftPlanHandle plHandle, metalfftMethod  method);
+
+METALFFTAPI metalfftStatus	metalfftSetPlanDevice(metalfftPlanHandle plHandle, amf::AMFComputeDevicePtr pComputeDevice);
 
 /*! @brief Set the expected layout of the input and output buffers
 *  @details Input and output buffers can be filled with either Hermitian, complex, or real numbers.  Complex numbers can be stored
@@ -64,8 +77,7 @@ CLFFTAPI metalfftStatus	metalfftSetPlanPrecision( metalfftPlanHandle plHandle, m
 *  @param[in] iLayout Indicates how the input buffers are laid out in memory
 *  @param[in] oLayout Indicates how the output buffers are laid out in memory
 */
-CLFFTAPI metalfftStatus	metalfftSetLayout( metalfftPlanHandle plHandle, metalfftLayout iLayout, metalfftLayout oLayout){return METALFFT_NOTIMPLEMENTED;}
-
+METALFFTAPI metalfftStatus	metalfftSetLayout(metalfftPlanHandle plHandle, metalfftLayout iLayout, metalfftLayout oLayout);
 /*! @brief Set whether the input buffers are to be overwritten with results
 *  @details If the setting performs an in-place transform, the input buffers are overwritten with the results of the
 *  transform.  If the setting performs an out-of-place transforms, the library looks for separate output buffers
@@ -73,8 +85,7 @@ CLFFTAPI metalfftStatus	metalfftSetLayout( metalfftPlanHandle plHandle, metalfft
 *  @param[in] plHandle Handle to a previously created plan
 *  @param[in] placeness Informs the library to either overwrite the input buffers with results or to write them in separate output buffers
 */
-CLFFTAPI metalfftStatus	metalfftSetResultLocation( metalfftPlanHandle plHandle, metalfftResultLocation placeness ){return METALFFT_NOTIMPLEMENTED;}
-
+METALFFTAPI metalfftStatus	metalfftSetResultLocation(metalfftPlanHandle plHandle, metalfftResultLocation placeness);
 /*! @brief Prepare the plan for execution.
 *  @details After all plan parameters are set, the client has the option of 'baking' the plan, which informs the runtime that
 *  no more change to the parameters of the plan is expected, and the OpenCL kernels can be compiled.  This optional function
@@ -100,7 +111,7 @@ CLFFTAPI metalfftStatus	metalfftSetResultLocation( metalfftPlanHandle plHandle, 
 *  @return Enum describing error condition; superset of OpenCL error codes
 */
 
-CLFFTAPI metalfftStatus	metalfftBakePlan( metalfftPlanHandle plHandle, unsigned int numQueues,  void *user_data ){return METALFFT_NOTIMPLEMENTED;}
+METALFFTAPI metalfftStatus	metalfftBakePlan(metalfftPlanHandle plHandle, unsigned int numQueues, void *user_data);
 
 
 /*! @brief Enqueue an FFT transform operation, and return immediately (non-blocking)
@@ -125,18 +136,14 @@ CLFFTAPI metalfftStatus	metalfftBakePlan( metalfftPlanHandle plHandle, unsigned 
 	 *  and the library needs temporary storage, an internal temporary buffer is created on the fly managed by the library.
 	 *  @return Enum describing error condition; superset of OpenCL error codes
 	 */
-	CLFFTAPI metalfftStatus	metalfftEnqueueTransform(
-												metalfftPlanHandle plHandle,
-												metalfftDirection dir,
-												unsigned int numQueuesAndEvents,
-												//cl_command_queue* commQueues,
-												unsigned int numWaitEvents//,
-												//const cl_event* waitEvents,
-												//cl_event* outEvents,
-												//cl_mem* inputBuffers,
-												//cl_mem* outputBuffers,
-												//cl_mem tmpBuffer
-												){return METALFFT_NOTIMPLEMENTED;}
+METALFFTAPI metalfftStatus	metalfftEnqueueTransform(
+	metalfftPlanHandle plHandle,
+	metalfftDirection dir,
+	amf::AMFBuffer **input,
+	int inputCount,
+	amf::AMFBuffer **output,
+	int outputCount
+);
 
 /*! @brief Release the resources of a plan.
 *  @details A plan may include resources, such as kernels, programs, and buffers that consume memory.  When a plan
@@ -144,13 +151,13 @@ CLFFTAPI metalfftStatus	metalfftBakePlan( metalfftPlanHandle plHandle, unsigned 
 *  @param[in,out] plHandle Handle to a previously created plan
 *  @return Enum describing error condition; superset of OpenCL error codes
 */
-CLFFTAPI metalfftStatus	metalfftDestroyPlan( metalfftPlanHandle* plHandle ){return METALFFT_NOTIMPLEMENTED;}
+METALFFTAPI metalfftStatus	metalfftDestroyPlan(metalfftPlanHandle* plHandle);
 
 /*! @brief Release all internal resources.
 *  @details Called when client is done with the FFT library, allowing the library to destroy all resources it has cached
 *  @return Enum describing error condition; superset of OpenCL error codes
 */
-CLFFTAPI metalfftStatus	metalfftTeardown( ){return METALFFT_NOTIMPLEMENTED;}
+METALFFTAPI metalfftStatus	metalfftTeardown();
 
 #ifdef __cplusplus
 }
