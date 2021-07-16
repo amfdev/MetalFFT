@@ -9,21 +9,7 @@
 #define METALFFT_STATIC 1
 //#define METALFFT_EXPORTS 1
 
-#if defined( _WIN32 )
-    #if !defined( __cplusplus )
-        #define inline __inline
-    #endif
-
-    #if defined( METALFFT_STATIC )
-        #define METALFFTAPI
-    #elif defined( METALFFT_EXPORTS )
-        #define METALFFTAPI __declspec( dllexport )
-    #else
-        #define METALFFTAPI __declspec( dllimport )
-    #endif
-#else
-    #define METALFFTAPI
-#endif
+#define METALFFTAPI
 
 #ifdef __cplusplus
 extern "C" {

@@ -6,10 +6,6 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
-if(NOT WIN32)
-  #message(SEND_ERROR "ERROR: Test are prepared for Windows ONLY!")
-endif()
-
 if(AMF_CORE_STATIC)
   message("static AMF build will be used")
   ADD_DEFINITIONS(-DAMF_CORE_STATIC)

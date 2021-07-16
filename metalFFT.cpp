@@ -10,7 +10,7 @@ metalfftStatus clfftSetPlanPrecision( metalfftPlanHandle plHandle, metalfftPreci
 	OPENCL_V( fftRepo.getPlan( plHandle, fftPlan, planLock ), _T( "fftRepo.getPlan failed" ) );
 	scopedLock sLock( *planLock, _T( "clfftSetPlanPrecision" ) );
 
-	if( precision >= ENDPRECISION )
+	if( precision >= METALFFT_ENDPRECISION )
 		return METALFFT_INVALID_ARG_VALUE;
 
 	//	We do not support METALFFT_*_FAST currently
@@ -26,8 +26,8 @@ metalfftStatus clfftSetPlanPrecision( metalfftPlanHandle plHandle, metalfftPreci
 	return	METALFFT_SUCCESS;
 }
 
-metalfftStatus	metalfftBakePlan(metalfftPlanHandle plHandle, unsigned int numQueues, void *user_data) 
-{ 
+metalfftStatus	metalfftBakePlan(metalfftPlanHandle plHandle, unsigned int numQueues, void *user_data)
+{
 	return METALFFT_SUCCESS;
 }
 
@@ -58,7 +58,7 @@ metalfftStatus	metalfftSetPlanPrecision(metalfftPlanHandle plHandle, metalfftPre
 	OPENCL_V(fftRepo.getPlan(plHandle, fftPlan, planLock), _T("fftRepo.getPlan failed"));
 	scopedLock sLock(*planLock, _T("metalfftSetPlanPrecision"));
 
-	if (precision >= ENDPRECISION)
+	if (precision >= METALFFT_ENDPRECISION)
 		return METALFFT_INVALID_ARG_VALUE;
 
 	//	If we modify the state of the plan, we assume that we can't trust any pre-calculated contents anymore
@@ -77,7 +77,7 @@ metalfftStatus	metalfftSetPlanFFTmethod(metalfftPlanHandle plHandle, metalfftMet
 	OPENCL_V(fftRepo.getPlan(plHandle, fftPlan, planLock), _T("fftRepo.getPlan failed"));
 	scopedLock sLock(*planLock, _T("metalfftSetPlanPrecision"));
 
-	if (method >= ENDMETHOD)
+	if (method >= METALFFT_ENDMETHOD)
 		return METALFFT_INVALID_ARG_VALUE;
 
 	fftPlan->baked = false;
@@ -237,7 +237,7 @@ metalfftStatus metalfftSetLayout( metalfftPlanHandle plHandle, metalfftLayout iL
 	scopedLock sLock( *planLock, _T( "clfftSetLayout" ) );
 
 	//	Basic error checking on parameter
-	if( ( iLayout >= ENDLAYOUT ) || ( oLayout >= ENDLAYOUT ) )
+	if( ( iLayout >= METALFFT_ENDLAYOUT ) || ( oLayout >= METALFFT_ENDLAYOUT ) )
 		return METALFFT_INVALID_ARG_VALUE;
 
 	//	We currently only support a subset of formats
@@ -308,7 +308,7 @@ metalfftStatus metalfftSetResultLocation( metalfftPlanHandle plHandle, metalfftR
 	scopedLock sLock( *planLock, _T( "clfftSetResultLocation" ) );
 
 	//	Basic error checking on parameter
-	if( placeness >= ENDPLACE )
+	if( placeness >= METALFFT_ENDPLACE )
 		return METALFFT_INVALID_ARG_VALUE;
 
 	//	If we modify the state of the plan, we assume that we can't trust any pre-calculated contents anymore

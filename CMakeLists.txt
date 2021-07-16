@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
-project(MetalFFT)
-set(NAME MetalFFT)
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
+
+if (POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif (POLICY CMP0048)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,59 +11,42 @@ set(CMAKE_SKIP_RULE_DEPENDENCY TRUE)
 
 enable_language(CXX)
 
-if(NOT AMF_NAME)
-  set(AMF_NAME openAmf)
-  set_property(GLOBAL PROPERTY AMF_NAME ${AMF_NAME})
-  get_property(AMF_NAME GLOBAL PROPERTY AMF_NAME)
-
-  message(WARNING "OpenAMF will be built with the default library name: " ${AMF_NAME})
-endif()
-
-if(NOT AMF_CORE_STATIC AND NOT AMF_LOADER_NAME)
-  set(AMF_LOADER_NAME openAmfLoader)
-  set_property(GLOBAL PROPERTY AMF_LOADER_NAME ${AMF_LOADER_NAME})
-  get_property(AMF_LOADER_NAME GLOBAL PROPERTY AMF_LOADER_NAME)
-
-  message(WARNING "OpenAMF will be built with the default loader helper name: " ${AMF_LOADER_NAME})
-endif()
-
-if(OpenCL_INCLUDE_DIR AND OpenCL_LIBRARIES)
-  get_filename_component(Path_To_OpenCL ${OpenCL_INCLUDE_DIR} ABSOLUTE)
-  message(WARNING "OpenCL location was set manually(sample)")
-  include_directories(${Path_To_OpenCL})
-  message("OpenCL_INCLUDE_DIRS: " ${Path_To_OpenCL})
-  message("OpenCL_LIBRARIES: " ${OpenCL_LIBRARIES})
-  ADD_DEFINITIONS(-DCL_TARGET_OPENCL_VERSION=120)
-
-
+if(NOT AMF_HOME)
+  message(SEND_ERROR "Error: MetalFFT needs AMF!")
 else()
-  find_package(OpenCL REQUIRED)
+  message("MetalFFT will use AMF at folder ${AMF_HOME}")
 
-  if(NOT OpenCL_FOUND)
-    message("")
-    message(SEND_ERROR "Error: Failed to find OpenCL!")
-    return()
-  else()
-    message("OpenCL found: " ${OpenCL_FOUND})
-    message("OpenCL_INCLUDE_DIRS: " ${OpenCL_INCLUDE_DIRS})
-    message("OpenCL_LIBRARIES: " ${OpenCL_LIBRARIES})
-    message("OpenCL_VERSION_STRING: " ${OpenCL_VERSION_STRING})
-    message("OpenCL_VERSION_MAJOR: " ${OpenCL_VERSION_MAJOR})
-    message("OpenCL_VERSION_MINOR: " ${OpenCL_VERSION_MINOR})
-
-    message("OpenCL_INCLUDE_DIR: ${OpenCL_INCLUDE_DIR}")
-    message("OpenCL_LIBRARY: ${OpenCL_LIBRARY}")
-
-    include_directories(${OpenCL_INCLUDE_DIR})
-    ADD_DEFINITIONS(-DCL_TARGET_OPENCL_VERSION=120)
-  endif()
+  include_directories(${AMF_HOME}/amf)
 endif()
+
+if(METALFFT_DIR)
+  message("")
+  message("METALFFT_DIR: " ${METALFFT_DIR})
+
+  #test the ${METALFFT_DIR} is not an absolute path
+  if(NOT IS_ABSOLUTE ${METALFFT_DIR})
+    #test this cmake is included from other project
+    if(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+      get_filename_component(Path_To_MetalFFT "${CMAKE_SOURCE_DIR}/${METALFFT_DIR}" ABSOLUTE)
+    #assume that the project is built from itself
+    else()
+      get_filename_component(Path_To_MetalFFT "${CMAKE_CURRENT_SOURCE_DIR}/${METALFFT_DIR}" ABSOLUTE)
+    endif()
+  else()
+    get_filename_component(Path_To_MetalFFT ${METALFFT_DIR} ABSOLUTE)
+  endif()
+
+  set_property(GLOBAL PROPERTY METALFFT_INCLUDES_DIR ${Path_To_MetalFFT})
+  message("METALFFT_DIR expanded: " ${Path_To_MetalFFT})
+
+  ADD_DEFINITIONS(-DUSE_METALFFT)
+  include_directories(${Path_To_MetalFFT})
+endif()
+############################################################################
 
 project(MetalFFT)
 set(NAME MetalFFT)
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c")
-
-enable_language(CXX)
 
 set(HEADER_FILES
   plan.h
@@ -72,27 +56,27 @@ set(HEADER_FILES
   metalFFT_common.h
   generator.h
   thirdparty/FFT_3.h
-)
+  )
 set(SOURCE_FILES
   action.cpp
 	generator.cpp
 	metalFFT.cpp
 	plan.cpp
 	repo.cpp
-)
+  )
 
 add_library(
-    ${NAME}
-    STATIC
-    #SHARED
-    ${SOURCE_FILES}
-    ${HEADER_FILES}
-)
-include_directories(../../../include)
-add_subdirectory(../../cmake ${AMF_NAME})
+  ${NAME}
+  STATIC
+  #SHARED
+  ${SOURCE_FILES}
+  ${HEADER_FILES}
+  )
+#include_directories(../../../include)
+#add_subdirectory(../../cmake ${AMF_NAME})
 
 if(AMF_CORE_STATIC)
-  target_link_libraries(${PROJECT_NAME} ${AMF_NAME} ${OpenCL_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${AMF_NAME})
 else()
   target_link_libraries(${PROJECT_NAME} ${AMF_LOADER_NAME})
 endif()

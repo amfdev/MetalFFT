@@ -19,14 +19,9 @@
 #if !defined( CLFFT_lock_H )
 #define CLFFT_lock_H
 
-#if defined( _WIN32 )
-	#include <windows.h>
-#else
-	#include <pthread.h>
-#endif
+#include "unicode.compatibility.h"
 
-//#include "private.h"
-#include <tchar.h>
+#include <pthread.h>
 #include <vector>
 #include <string>
 #include <locale>
@@ -34,96 +29,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <cassert>
-#include "unicode.compatibility.h"
 
-#if defined( _WIN32 )
-
-//	lockRAII provides an abstraction for the concept of a mutex; it wraps all  mutex functions in generic methods
-//	On windows, the mutex is implemented as a CRITICAL_SECTION, as this is the fastest intraprocess mutex
-//	available.
-//	The template argument 'debugPrint' activates debugging information, but if not active the compiler optimizes
-//	the print statements out
-template< bool debugPrint >
-class lockRAII
-{
-	CRITICAL_SECTION cs;
-	tstring			csName;
-	tstringstream	tstream;
-
-	//	Does not make sense to create a copy of a lock object; private method
-	lockRAII( const lockRAII& rhs ): csName( rhs.csName )
-	{
-		tstream << std::hex << std::showbase;
-		::InitializeCriticalSection( &cs );
-	}
-
-	public:
-		lockRAII( )
-		{
-			tstream << std::hex << std::showbase;
-			::InitializeCriticalSection( &cs );
-		}
-
-		lockRAII( const tstring& name ): csName( name )
-		{
-			tstream << std::hex << std::showbase;
-			::InitializeCriticalSection( &cs );
-		}
-
-		~lockRAII( )
-		{
-			::DeleteCriticalSection( &cs );
-		}
-
-		tstring& getName( )
-		{
-			return csName;
-		}
-
-		void setName( const tstring& name )
-		{
-			csName	= name;
-		}
-
-		void enter( )
-		{
-			if( debugPrint )
-			{
-				tstream.str( _T( "" ) );
-				tstream << _T( "Attempting CRITICAL_SECTION( " ) << csName << _T( " )" ) << std::endl;
-				tout << tstream.str( );
-			}
-
-			::EnterCriticalSection( &cs );
-
-			if( debugPrint )
-			{
-				tstream.str( _T( "" ) );
-				tstream << _T( "Acquired CRITICAL_SECTION( " ) << csName << _T( " )" ) << std::endl;
-				tstream << _T( "\tOwningThread( " ) << cs.OwningThread << _T( " )" ) << std::endl;
-				tstream << _T( "\tLockcount( " ) << cs.LockCount << _T( " )" ) << std::endl;
-				tstream << _T( "\tRecursionCount( " ) << cs.RecursionCount << _T( " )" ) << std::endl;
-				tout << tstream.str( );
-			}
-		}
-
-		void leave( )
-		{
-			if( debugPrint )
-			{
-				tstream.str( _T( "" ) );
-				tstream << _T( "Releasing CRITICAL_SECTION( " ) << csName << _T( " )" ) << std::endl;
-				tstream << _T( "\tOwningThread( " ) << cs.OwningThread << _T( " )" ) << std::endl;
-				tstream << _T( "\tLockcount( " ) << cs.LockCount << _T( " )" ) << std::endl;
-				tstream << _T( "\tRecursionCount( " ) << cs.RecursionCount << _T( " )" ) << std::endl << std::endl;
-				tout << tstream.str( );
-			}
-
-			::LeaveCriticalSection( &cs );
-		}
-};
-
-#else
 //	lockRAII provides an abstraction for the concept of a mutex; it wraps all  mutex functions in generic methods
 //	Linux implementation not done yet
 //	The template argument 'debugPrint' activates debugging information, but if not active the compiler optimizes
@@ -212,7 +118,6 @@ class lockRAII
 			::pthread_mutex_unlock( &mutex );
 		}
 };
-#endif
 
 //	Class used to make sure that we enter and leave critical sections in pairs
 //	The template logic logs our CRITICAL_SECTION actions; if the template parameter is false,

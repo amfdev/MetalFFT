@@ -1,8 +1,8 @@
+#pragma once
+
 #include <stdint.h>
 #include <stdio.h>
 #include "unicode.compatibility.h"
-#pragma once
-#include <tchar.h>
 
 /*!  @brief metalfft error codes definition(incorporating OpenCL error definitions)
  *
@@ -89,7 +89,7 @@ typedef enum metalfftLayout_
 	METALFFT_HERMITIAN_INTERLEAVED,		/*!< Compressed form of complex numbers; complex-conjugates are not stored, real and imaginary components are stored in the same array. */
 	METALFFT_HERMITIAN_PLANAR,				/*!< Compressed form of complex numbers; complex-conjugates are not stored, real and imaginary components are stored in separate arrays. */
 	METALFFT_REAL,							/*!< An array of real numbers, with no corresponding imaginary components. */
-	ENDLAYOUT			/*!< The last value of the enum, and marks the length of clfftLayout. */
+	METALFFT_ENDLAYOUT			/*!< The last value of the enum, and marks the length of clfftLayout. */
 } metalfftLayout;
 
 typedef enum metalfftPrecision_
@@ -98,7 +98,7 @@ typedef enum metalfftPrecision_
 	METALFFT_DOUBLE,			/*!< An array of complex numbers, with real and imaginary components saved as doubles. */
 	METALFFT_SINGLE_FAST,		/*!< Faster implementation preferred. */
 	METALFFT_DOUBLE_FAST,		/*!< Faster implementation preferred. */
-	ENDPRECISION	/*!< The last value of the enum, and marks the length of clfftPrecision. */
+	METALFFT_ENDPRECISION	/*!< The last value of the enum, and marks the length of clfftPrecision. */
 } metalfftPrecision;
 
 
@@ -110,7 +110,7 @@ typedef enum metalfftDirection_
 	METALFFT_BACKWARD	= 1,		/*!< FFT transform from frequency to time domain. */
 	METALFFT_MINUS		= -1,		/*!< Alias for the forward transform. */
 	METALFFT_PLUS		= 1,		/*!< Alias for the backward transform. */
-	ENDDIRECTION			/*!< The last value of the enum, and marks the length of metalfftDirection. */
+	METALFFT_ENDDIRECTION			/*!< The last value of the enum, and marks the length of metalfftDirection. */
 } metalfftDirection;
 
 /*!  @brief Specify wheter the input buffers are overwritten with results */
@@ -118,7 +118,7 @@ typedef enum metalfftResultLocation_
 {
 	METALFFT_INPLACE		= 1,		/*!< Input and output buffers are the same (default). */
 	METALFFT_OUTOFPLACE,				/*!< Input and output buffers are separate. */
-	ENDPLACE				/*!< The last value of the enum, and marks the length of metalfftPlaceness. */
+	METALFFT_ENDPLACE				/*!< The last value of the enum, and marks the length of metalfftPlaceness. */
 } metalfftResultLocation;
 
 
@@ -146,16 +146,15 @@ typedef enum metalfftDim_
 	METALFFT_1D		= 1,		/*!< 1 Dimensional FFT transform (default). */
 	METALFFT_2D,					/*!< 2 Dimensional FFT transform. */
 	METALFFT_3D,					/*!< 3 Dimensional FFT transform. */
-	ENDDIMENSION			/*!< The last value of the enum, and marks the length of clfftDim. */
+	METALFFT_ENDDIMENSION			/*!< The last value of the enum, and marks the length of clfftDim. */
 } metalfftDim;
 
 typedef enum metalfftImpl_
 {
-	METALFFT_AUTO	= 1,	
-	METALFFT_HOST,			
-	METALFFT_METAL,		
-	METALFFT_CL,		
-	ENDMETHOD	
+	METALFFT_AUTO	= 1,
+	METALFFT_HOST,
+	METALFFT_METAL,
+	METALFFT_ENDMETHOD
 } metalfftMethod;
 
 inline tstring metalfftErrorStatusAsString(const int& status)
