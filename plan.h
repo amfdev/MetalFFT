@@ -7,20 +7,22 @@
 typedef     uint32_t     metal_uint;
 
 //todo - add constructor!
-class	FFTPlan
+class    FFTPlan
 {
 
 public:
-	bool baked;
+    bool baked;
     metalfftPrecision           precision;
     metalfftLayout              inputLayout;
-	metalfftLayout              outputLayout;
+    metalfftLayout              outputLayout;
     metalfftResultLocation      placeness;
     metalfftMethod              method;
+    metalfftDim                 dim;
 
     // User created plan
-	bool userPlan;
-	metalfftPlanHandle plHandle;
+    bool userPlan;
+    metalfftPlanHandle plHandle;
 
     amf::AMFComputeDevicePtr pComputeDevice;
+    amf::AMFContextPtr pContext;
 };
