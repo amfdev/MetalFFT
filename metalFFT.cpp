@@ -27,8 +27,8 @@ metalfftStatus clfftSetPlanPrecision( metalfftPlanHandle plHandle, metalfftPreci
 	return	METALFFT_SUCCESS;
 }
 
-metalfftStatus	metalfftBakePlan(metalfftPlanHandle plHandle, unsigned int numQueues, void *user_data) 
-{ 
+metalfftStatus	metalfftBakePlan(metalfftPlanHandle plHandle, unsigned int numQueues, void *user_data)
+{
 	return METALFFT_SUCCESS;
 }
 
@@ -87,7 +87,7 @@ metalfftStatus	metalfftSetPlanFFTmethod(metalfftPlanHandle plHandle, metalfftMet
 	return	METALFFT_SUCCESS;
 }
 
-metalfftStatus	metalfftSetPlanDevice(metalfftPlanHandle plHandle, amf::AMFComputeDevicePtr pComputeDevice)
+metalfftStatus	metalfftSetPlanDevice(metalfftPlanHandle plHandle, const amf::AMFComputeDevicePtr & computeDevice)
 {
 	FFTRepo& fftRepo = FFTRepo::getInstance();
 	FFTPlan* fftPlan = NULL;
@@ -97,12 +97,12 @@ metalfftStatus	metalfftSetPlanDevice(metalfftPlanHandle plHandle, amf::AMFComput
 	scopedLock sLock(*planLock, _T("metalfftSetPlanPrecision"));
 
 	fftPlan->baked = false;
-	fftPlan->pComputeDevice = pComputeDevice;
+	fftPlan->pComputeDevice = computeDevice;
 
 	return	METALFFT_SUCCESS;
 }
 
-METALFFTAPI metalfftStatus	metalfftSetPlanContext(metalfftPlanHandle plHandle, amf::AMFContextPtr context)
+METALFFTAPI metalfftStatus	metalfftSetPlanContext(metalfftPlanHandle plHandle, const amf::AMFContextPtr & context)
 {
 	FFTRepo& fftRepo = FFTRepo::getInstance();
 	FFTPlan* fftPlan = NULL;

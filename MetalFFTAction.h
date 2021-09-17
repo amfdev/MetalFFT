@@ -26,9 +26,9 @@ public:
 		OPENCL_V(fftRepo.getPlan(plHandle, fftPlan, planLock), _T("fftRepo.getPlan failed"));
 		scopedLock sLock(*planLock, _T("MetalFFTAction"));
 
-        
+
 		amf::AMFBuffer *in = input[0];
-		
+
 		//TODO: condition check
 		amf::AMFBuffer* realOut;
 		if (fftPlan->placeness == METALFFT_OUTOFPLACE)
@@ -71,7 +71,7 @@ public:
 #ifndef USE_HOST_IMPL
             realOut->Convert(amf::AMF_MEMORY_HOST);
 #endif // !USE_HOST_IMPL
-            
+
             int elementsCount = bufferSize / sizeof(float) / 2;
             float* inputData = static_cast<float*>(in->GetNative());
             float* outputData = static_cast<float*>(realOut->GetNative());
@@ -107,17 +107,17 @@ public:
 #ifndef USE_HOST_IMPL
         amf::AMFComputePtr pCompute;
         fftPlan->pComputeDevice->CreateCompute(nullptr, &pCompute);
-        
+
         amf::AMFComputeKernelPtr pKernel1;
         res = pCompute->GetKernel(kernel_Butterfly_j_0, &pKernel1);
-         
+
         amf::AMFComputeKernelPtr pKernel2;
         res = pCompute->GetKernel(kernel_Butterfly, &pKernel2);
 
         res = pKernel2->SetArgBuffer(0, output, amf::AMF_ARGUMENT_ACCESS_WRITE);
 #endif // !USE_HOST_IMPL
         for (int stage = 1; stage <= powerOf2; stage++) // Loop for M stages, where 2^M = N
-        { 
+        {
             int BSep = (int)(pow(2, stage)); // Separation between butterflies = 2^stage
             int P = bufferSize / BSep;             // Similar Wn's in this stage = N/Bsep
             int BWidth = BSep / 2;     // Butterfly width (spacing between opposite points) = Separation / 2.
@@ -136,7 +136,7 @@ public:
             res = pKernel2->SetArgInt32(2, BWidth);
 #endif // USE_HOST_IMPL
             //
-            
+
 
             for (int j = 1; j < BWidth; j++) // Loop for j calculations per butterfly
             {
@@ -157,8 +157,8 @@ public:
                 res = pKernel2->Enqueue(1, 0, sizeGlobal, sizeLocal);
                 res = pCompute->FlushQueue();
                 res = pCompute->FinishQueue();
-#endif // USE_HOST_IMPL 
-            } 
+#endif // USE_HOST_IMPL
+            }
         }
         return METALFFT_SUCCESS;
 	}
@@ -166,11 +166,11 @@ public:
     void butterfly_j_0_metal(amf::AMFBuffer* outputData, amf_size elementsCount, int BSep, int BWidth, amf::AMFComputeKernelPtr pKernel1)
     {
         AMF_RESULT res = AMF_FAIL;
-        
+
         res = pKernel1->SetArgBuffer(0, outputData, amf::AMF_ARGUMENT_ACCESS_WRITE);
         res = pKernel1->SetArgInt32(1, BSep);
         res = pKernel1->SetArgInt32(2, BWidth);
-        
+
         elementsCount /= BSep;
         amf_size sizeLocal[3] = { elementsCount, 1, 1 };
         amf_size sizeGlobal[3] = { elementsCount, 1, 1 };
@@ -288,7 +288,7 @@ public:
                 {
                     uint id, index;
                     float re, im;
-                    id = get_global_id(0);     
+                    id = get_global_id(0);
                     index = id * step;
                     re = result[(index + bwidth) * 2];
                     im = result[(index + bwidth) * 2 + 1];
@@ -314,7 +314,7 @@ public:
                 {
                     uint id, index;
                     float re, im;
-                    id = get_global_id(0);     
+                    id = get_global_id(0);
                     index = j + (id) * step;
 
                     re = result[(index + bwidth) * 2] * wn_re - result[(index + bwidth) * 2 + 1] * wn_im;

@@ -63,6 +63,8 @@ set(SOURCE_FILES
 	metalFFT.cpp
 	plan.cpp
 	repo.cpp
+  thirdparty/FFT_3.cpp
+  MetalFFTAction.cpp
   )
 
 add_library(

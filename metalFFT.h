@@ -54,9 +54,9 @@ METALFFTAPI metalfftStatus	metalfftSetPlanPrecision(metalfftPlanHandle plHandle,
 
 METALFFTAPI metalfftStatus	metalfftSetPlanFFTmethod(metalfftPlanHandle plHandle, metalfftMethod  method);
 
-METALFFTAPI metalfftStatus	metalfftSetPlanDevice(metalfftPlanHandle plHandle, amf::AMFComputeDevicePtr pComputeDevice);
+METALFFTAPI metalfftStatus	metalfftSetPlanDevice(metalfftPlanHandle plHandle, const amf::AMFComputeDevicePtr & computeDevice);
 
-METALFFTAPI metalfftStatus	metalfftSetPlanContext(metalfftPlanHandle plHandle, amf::AMFContextPtr context);
+METALFFTAPI metalfftStatus	metalfftSetPlanContext(metalfftPlanHandle plHandle, const amf::AMFContextPtr & context);
 
 /*! @brief Set the expected layout of the input and output buffers
 *  @details Input and output buffers can be filled with either Hermitian, complex, or real numbers.  Complex numbers can be stored

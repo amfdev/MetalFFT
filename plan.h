@@ -11,7 +11,7 @@ class    FFTPlan
 {
 
 public:
-    bool baked;
+    bool baked = false;
     metalfftPrecision           precision;
     metalfftLayout              inputLayout;
     metalfftLayout              outputLayout;
@@ -20,7 +20,7 @@ public:
     metalfftDim                 dim;
 
     // User created plan
-    bool userPlan;
+    bool userPlan = false;
     metalfftPlanHandle plHandle;
 
     amf::AMFComputeDevicePtr pComputeDevice;
